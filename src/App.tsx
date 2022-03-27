@@ -1,48 +1,45 @@
-import React, { KeyboardEvent } from "react";
-import logo from "./logo.svg";
+import * as React from "react";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import GroupIcon from "@mui/icons-material/Group";
+import ChatIcon from "@mui/icons-material/Chat";
+import Paper from "@mui/material/Paper";
+import { Box } from "@mui/system";
+import { useState, useEffect } from "react";
 import "./App.css";
+import Friends from "./pages/Friends";
+import { friends } from "./pages/Friends/data";
 
-import "./App.css";
-import Button from "./Button";
-import Title from "./Title";
-import Adult from "./Adult";
-import Photo from "./Photo";
-import Counter from "./Counter";
-import Adder from "./Adder";
-import WelcomeName from "./WelcomeName";
-import ConditionalText from "./ConditionalText";
-import HiddenName from "./HiddenName";
-import TODO from "./TODO";
+const App = (): JSX.Element => {
+  const [currentTab, setCurrentTab] = useState<string>("friends");
 
-const App = () => {
-  const headline = "Title!";
-  const subline = "";
-  const sample_address = "https://t1.daumcdn.net/cfile/blog/253D733E5607868905";
-  const sample_description = "아기 강강쥬! ^0^/";
-  const defaultCount = 0;
-
-  const preventKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    console.log(event.key);
-    if (event.key === "h") {
-      event.preventDefault();
-      event.stopPropagation();
-    }
+  const changeTab = (changedValue: string) => {
+    setCurrentTab(changedValue);
   };
 
   return (
-    <div className="App">
-      <>
-        <Title title={headline} />
-        <Photo address={sample_address} description={sample_description} />
-        <input type="text" onKeyDown={preventKeyDown} />
-        <Counter defaultCount={defaultCount} />
-        <Adder></Adder>
-        <WelcomeName></WelcomeName>
-        <ConditionalText></ConditionalText>
-        <HiddenName></HiddenName>
-        <TODO></TODO>
-      </>
-    </div>
+    <section>
+      <Box sx={{ pb: 9 }}>{currentTab === "friends" && <Friends />}</Box>
+      <Paper
+        sx={{ position: "fixed", bottom: 0, left: 0, right: 0 }}
+        elevation={3}
+      >
+        <Tabs centered variant="fullWidth" value={currentTab}>
+          <Tab
+            icon={<GroupIcon />}
+            label="친구"
+            value="friends"
+            onClick={() => changeTab("friends")}
+          />
+          <Tab
+            icon={<ChatIcon />}
+            label="채팅"
+            value="chats"
+            onClick={() => changeTab("chats")}
+          />
+        </Tabs>
+      </Paper>
+    </section>
   );
 };
 
