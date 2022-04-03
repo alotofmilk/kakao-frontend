@@ -17,9 +17,15 @@ type SearchResultType = {
   statusMessage: string;
 };
 
-const FriendAdd = (): JSX.Element => {
+type FriendAddType = {
+  callback: () => void;
+};
+
+const FriendAdd = (props: FriendAddType): JSX.Element => {
+  const { callback } = props;
   const [phone, setPhone] = useState("");
   const [user, setUser] = useState<SearchResultType>();
+  const [newFriend, setNewFriend] = useState<FriendAddType>();
 
   const updatePhone = (event: ChangeEvent<HTMLInputElement>) => {
     const inputText = event.currentTarget.value;
@@ -36,6 +42,23 @@ const FriendAdd = (): JSX.Element => {
       }
     );
     setUser(data);
+  };
+
+  const addUser = async () => {
+    try {
+      await axios.post("http://localhost:5000/friends", {
+        userId: 1,
+        phone,
+      });
+      await callback();
+    } catch (e) {
+      if (axios.isAxiosError(e) && e.response) {
+        const { data } = e.response;
+        if (data) {
+          alert(data.message);
+        }
+      }
+    }
   };
 
   return (
@@ -61,7 +84,7 @@ const FriendAdd = (): JSX.Element => {
             {user && (
               <ListItem
                 secondaryAction={
-                  <IconButton>
+                  <IconButton onClick={addUser}>
                     <PersonAddIcon />
                   </IconButton>
                 }
@@ -71,7 +94,10 @@ const FriendAdd = (): JSX.Element => {
                     <ImageIcon />
                   </Avatar>
                 </ListItemAvatar>
-                <ListItemText primary={"친구이름"} />
+                <ListItemText
+                  primary={user.name}
+                  secondary={user.statusMessage}
+                />
               </ListItem>
             )}
           </>
@@ -82,3 +108,6 @@ const FriendAdd = (): JSX.Element => {
 };
 
 export default FriendAdd;
+function getFriendList() {
+  throw new Error("Function not implemented.");
+}

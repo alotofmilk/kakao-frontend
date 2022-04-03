@@ -8,10 +8,13 @@ import Avatar from "@mui/material/Avatar";
 import ImageIcon from "@mui/icons-material/Image";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { friends } from "./data";
-import { ChangeEvent, useState, useEffect } from "react";
+import { ChangeEvent, MouseEvent, useState, useEffect } from "react";
 import { Container, Grid, Modal } from "@mui/material";
 import FriendAdd from "./components/FriendAdd";
 import axios from "axios";
+import Button from "@mui/material/Button";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 
 type FriendType = {
   id: number;
@@ -23,11 +26,12 @@ const Friends = (): JSX.Element => {
   const [originalFriends, setOriginalFriends] = useState<FriendType[]>([]);
   const [friendList, setFriendList] = useState(friends);
   const [open, setOpen] = useState(false);
+  const [anchor, setAnchor] = useState<null | HTMLElement>(null);
 
   const changeSearchText = (event: ChangeEvent<HTMLInputElement>) => {
     const inputText = event.currentTarget.value;
     if (inputText.length === 0) {
-      setFriendList(friends);
+      setFriendList(originalFriends);
     } else {
       const filteredFriends = friends.filter((friend) =>
         friend.name.includes(inputText)
@@ -52,6 +56,19 @@ const Friends = (): JSX.Element => {
     setFriendList(data);
   };
 
+  const finishAddFriend = async () => {
+    await getFriendList();
+    closeModal();
+  };
+
+  const openMenu = (event: MouseEvent<HTMLDivElement>) => {
+    setAnchor(event.currentTarget);
+  };
+
+  const closeMenu = () => {
+    setAnchor(null);
+  };
+
   useEffect(() => {
     getFriendList();
   }, []);
@@ -59,8 +76,19 @@ const Friends = (): JSX.Element => {
   return (
     <Container>
       <Modal open={open} onClose={closeModal}>
-        <FriendAdd />
+        <FriendAdd callback={finishAddFriend} />
       </Modal>
+      <Menu
+        open={anchor !== null}
+        anchorEl={anchor}
+        onClose={closeMenu}
+        anchorOrigin={{
+          vertical: "center",
+          horizontal: "center",
+        }}
+      >
+        <MenuItem>채팅하기</MenuItem>
+      </Menu>
       <Box>
         <Grid container>
           <Grid item xs={10.5}>
@@ -84,7 +112,7 @@ const Friends = (): JSX.Element => {
       <List>
         {friendList.map((friend) => {
           return (
-            <ListItemButton key={friend.id}>
+            <ListItemButton key={friend.id} onClick={openMenu}>
               <ListItemAvatar>
                 <Avatar>
                   <ImageIcon />
